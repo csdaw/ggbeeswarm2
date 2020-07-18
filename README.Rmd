@@ -2,8 +2,9 @@
 output: 
   html_document: 
     keep_md: yes
-    toc: yes
+    toc: no
 ---
+
 ```{r setup, echo=FALSE, message=FALSE}
 knitr::opts_chunk$set(
   fig.retina=2,
@@ -19,9 +20,9 @@ knitr::opts_chunk$set(
 
 ## Note
 
-This is a fork of ggbeeswarm. The `geom_beeswarm` function has been rewritten to
-be compatible with R >= v4.0.0. Additionally, `geom_beeswarm` now works almost 
-identically to the `beeswarm` function from the 
+This is a fork of ggbeeswarm. A new function `stat_beeswarm` function has been 
+written which is compatible with R >= v4.0.0. Additionally, `stat_beeswarm` 
+works almost identically to the `beeswarm` function from the 
 [beeswarm](https://cran.r-project.org/web/packages/beeswarm/index.html) package.
 
 For example:

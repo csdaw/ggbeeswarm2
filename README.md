@@ -1,10 +1,3 @@
----
-output: 
-  html_document: 
-    keep_md: yes
-    toc: yes
----
-
 
 # ggbeeswarm2: Beeswarm-style plots with ggplot2
 
@@ -13,9 +6,9 @@ output:
 
 ## Note
 
-This is a fork of ggbeeswarm. The `geom_beeswarm` function has been rewritten to
-be compatible with R >= v4.0.0. Additionally, `geom_beeswarm` now works almost 
-identically to the `beeswarm` function from the 
+This is a fork of ggbeeswarm. A new function `stat_beeswarm` function has been 
+written which is compatible with R >= v4.0.0. Additionally, `stat_beeswarm` 
+works almost identically to the `beeswarm` function from the 
 [beeswarm](https://cran.r-project.org/web/packages/beeswarm/index.html) package.
 
 For example:
@@ -152,29 +145,25 @@ ggplot(iris, aes(Species, Sepal.Length)) + geom_quasirandom(method = "tukey") + 
 <img src="README_files/figure-html/ggplot2-methods-1.png" width="576" />
 
 ```r
-ggplot(iris, aes(Species, Sepal.Length)) + geom_quasirandom(method = "tukeyDense") + 
-    ggtitle("Tukey + density")
+ggplot(iris, aes(Species, Sepal.Length)) + geom_quasirandom(method = "tukeyDense") + ggtitle("Tukey + density")
 ```
 
 <img src="README_files/figure-html/ggplot2-methods-2.png" width="576" />
 
 ```r
-ggplot(iris, aes(Species, Sepal.Length)) + geom_quasirandom(method = "frowney") + 
-    ggtitle("Banded frowns")
+ggplot(iris, aes(Species, Sepal.Length)) + geom_quasirandom(method = "frowney") + ggtitle("Banded frowns")
 ```
 
 <img src="README_files/figure-html/ggplot2-methods-3.png" width="576" />
 
 ```r
-ggplot(iris, aes(Species, Sepal.Length)) + geom_quasirandom(method = "smiley") + 
-    ggtitle("Banded smiles")
+ggplot(iris, aes(Species, Sepal.Length)) + geom_quasirandom(method = "smiley") + ggtitle("Banded smiles")
 ```
 
 <img src="README_files/figure-html/ggplot2-methods-4.png" width="576" />
 
 ```r
-ggplot(iris, aes(Species, Sepal.Length)) + geom_quasirandom(method = "pseudorandom") + 
-    ggtitle("Jittered density")
+ggplot(iris, aes(Species, Sepal.Length)) + geom_quasirandom(method = "pseudorandom") + ggtitle("Jittered density")
 ```
 
 <img src="README_files/figure-html/ggplot2-methods-5.png" width="576" />
