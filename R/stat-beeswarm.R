@@ -1,5 +1,11 @@
 StatBeeswarm <- ggproto("StatBeeswarm", Stat,
                         compute_group = function(data, scales) {
+                          x.offset <- beeswarm::swarmx(
+                            x = rep(0, legnth(data$y)), y = data$y,
+                            cex = 1, side = 0L, priority = "ascending"
+                          )$x
+                          
+                          data$x <- data$x + x.offset
                           data
                         },
                         
