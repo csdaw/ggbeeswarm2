@@ -38,7 +38,7 @@ beeswarm::beeswarm(distro,
 ```r
 # ggbeeswarm2
 library(dplyr)
-library(ggplot2)
+library(ggbeeswarm)
 
 distro2 <- as.data.frame(rev(distro)) %>% 
   tidyr::pivot_longer(
@@ -48,7 +48,7 @@ distro2 <- as.data.frame(rev(distro)) %>%
     )
 
  ggplot2::ggplot(distro2, aes(x = rev(variable), y = value)) + 
-   beeswarm::stat_beeswarm(method = "hex", size = 2) + 
+   ggbeeswarm::stat_beeswarm(method = "hex") + 
    scale_y_continuous(limits = c(-3, 3)) + 
    theme(
      plot.margin = unit(c(0.11, 0.07, 0.11, 0.07), "npc")

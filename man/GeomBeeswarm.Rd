@@ -4,7 +4,9 @@
 \name{GeomBeeswarm}
 \alias{GeomBeeswarm}
 \title{geom object for use in geom_beeswarm}
-\format{An object of class \code{GeomBeeswarm} (inherits from \code{GeomPoint}, \code{Geom}, \code{ggproto}, \code{gg}) of length 2.}
+\format{
+An object of class \code{GeomBeeswarm} (inherits from \code{GeomPoint}, \code{Geom}, \code{ggproto}, \code{gg}) of length 2.
+}
 \usage{
 GeomBeeswarm
 }
