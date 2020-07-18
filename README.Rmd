@@ -12,10 +12,50 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Beeswarm-style plots with ggplot2
+# ggbeeswarm2: Beeswarm-style plots with ggplot2
 
 [![Build Status](https://travis-ci.org/eclarke/ggbeeswarm.svg?branch=master)](https://travis-ci.org/eclarke/ggbeeswarm)
 [![CRAN status](https://www.r-pkg.org/badges/version/ggbeeswarm)](https://cran.r-project.org/package=ggbeeswarm)
+
+## Note
+
+This is a fork of ggbeeswarm. The `geom_beeswarm` function has been rewritten to
+be compatible with R >= v4.0.0. Additionally, `geom_beeswarm` now works almost 
+identically to the `beeswarm` function from the 
+[beeswarm](https://cran.r-project.org/web/packages/beeswarm/index.html) package.
+
+For example:
+
+```{r, message=FALSE, warning=FALSE}
+set.seed(123)
+distro <- list(runif = runif(100, min = -3, max = 3), 
+               rnorm = rnorm(100))
+
+# beeswarm
+beeswarm::beeswarm(distro, 
+                   col = 2:3, pch = 16,
+                   method = "hex",
+                   main = "title")
+
+# ggbeeswarm2
+library(dplyr)
+library(ggplot2)
+
+distro2 <- as.data.frame(rev(distro)) %>% 
+  tidyr::pivot_longer(
+    everything(), 
+    values_to = "value", 
+    names_to = "variable"
+    )
+
+ ggplot2::ggplot(distro2, aes(x = rev(variable), y = value)) + 
+   beeswarm::stat_beeswarm(method = "hex", size = 2) + 
+   scale_y_continuous(limits = c(-3, 3)) + 
+   theme(
+     plot.margin = unit(c(0.11, 0.07, 0.11, 0.07), "npc")
+   )
+```
+
 
 ## Introduction
 Beeswarm plots (aka column scatter plots or violin scatter plots) are a way of plotting points that would ordinarily overlap so that they fall next to each other instead. In addition to reducing overplotting, it helps visualize the density of the data at each point (similar to a violin plot), while still showing each data point individually.
