@@ -38,6 +38,8 @@ StatBeeswarm <- ggproto("StatBeeswarm", Stat,
                             ## non-swarm methods
 
                             # define size.x and size.y
+                            sizeMultiplier <- par('cex') * 1 * spacing
+                            print(sizeMultiplier)
                             size.x <- xinch(0.08, warn.log = FALSE) * spacing
                             size.y <- yinch(0.08, warn.log = FALSE) * spacing
                             
@@ -110,8 +112,9 @@ StatBeeswarm <- ggproto("StatBeeswarm", Stat,
                               )
                             }
                           }
-                          
-                          data$x <- data$x + x.offset
+                          data$x.orig <- data$x
+                          data$x.offset <- x.offset
+                          data$x <- data$x + data$x.offset
                           
                           flip_data(data, flipped_aes)
                         },
@@ -124,6 +127,7 @@ stat_beeswarm <- function(mapping = NULL, data = NULL,
                           position = "identity", ..., method = "swarm",
                           spacing = 1, breaks = NULL, side = 0L, priority = "ascending",
                           corral = "none", corral.width = 0.889,
+                          dodge.width = NULL,
                           na.rm = FALSE, orientation = NA, 
                           show.legend = NA, inherit.aes = TRUE) {
   stopifnot(method %in% c("swarm", "centre", "center", "hex", "square"))
@@ -137,7 +141,8 @@ stat_beeswarm <- function(mapping = NULL, data = NULL,
   
   layer(
     stat = StatBeeswarm, data = data, mapping = mapping, geom = "point", 
-    position = position, show.legend = show.legend, inherit.aes = inherit.aes,
+    position = position_beeswarm(width = dodge.width), 
+    show.legend = show.legend, inherit.aes = inherit.aes,
     params = list(
       na.rm = na.rm,
       orientation = orientation,
