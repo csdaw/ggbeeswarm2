@@ -8,10 +8,34 @@ StatQuasirandom <- ggproto("StatQuasirandom", Stat,
                                main_is_optional = TRUE
                              )
                              
-                             # find size of largest data$group
-                             max.length <- max(data.frame(table(data$group))$Freq)
+                             # get number of points in each x axis group and 
+                             # find the largest group
+                             max.length <- max(data.frame(table(data$x))$Freq)
                              params$max.length <- max.length
                              params
+                           },
+                           
+                           setup_data = function(data, params) {
+                             data <- flip_data(data, params$flipped_aes)
+                             data <- remove_missing(
+                               data,
+                               na.rm = params$na.rm,
+                               vars = "x",
+                               name = "stat_quasirandom"
+                             )
+                             
+                             if(!is.null(params$dodge.width)) {
+                               data <- ggplot2:::collide(
+                                 data,
+                                 params$dodge.width,
+                                 name = "position_quasirandom",
+                                 strategy = ggplot2:::pos_dodge,
+                                 n = NULL,
+                                 check.width = FALSE
+                               )
+                             }
+                             
+                             flip_data(data, params$flipped_aes)
                            },
                            
                            extra_params = c("na.rm", "orientation"),
@@ -19,8 +43,16 @@ StatQuasirandom <- ggproto("StatQuasirandom", Stat,
                            compute_group = function(data, scales, flipped_aes = FALSE,
                                                     width = 0.4, vary.width = FALSE,
                                                     max.length = NULL, bandwidth = 0.5, 
-                                                    bins = NULL, method = "quasirandom") {
+                                                    bins = NULL, method = "quasirandom",
+                                                    dodge.width = NULL) {
                              data <- flip_data(data, flipped_aes)
+                             
+                             # set width if not specified (not sure if this is necessary)
+                             if (is.null(width)) {
+                               width <- ggplot2::resolution(
+                                 data$x, zero = FALSE) * 0.4
+                               
+                             }
                              
                              x.offset <- offset_x(
                                data$y,
@@ -32,8 +64,8 @@ StatQuasirandom <- ggproto("StatQuasirandom", Stat,
                                method = method,
                                nbins = bins
                              )
-
                              data$x <- data$x + x.offset
+                             
                              flip_data(data, flipped_aes)
                            },
                            
@@ -45,6 +77,7 @@ stat_quasirandom <- function(mapping = NULL, data = NULL,
                              position = "identity", ..., 
                              width = 0.4, vary.width = FALSE, bandwidth = 0.5,
                              bins = NULL, method = "quasirandom",
+                             dodge.width = NULL,
                              na.rm = FALSE, orientation = NA,
                              show.legend = NA, inherit.aes = TRUE) {
   layer(
@@ -58,6 +91,7 @@ stat_quasirandom <- function(mapping = NULL, data = NULL,
       bandwidth = bandwidth,
       bins = bins,
       method = method,
+      dodge.width = dodge.width,
       ...
     )
   )
@@ -66,7 +100,7 @@ stat_quasirandom <- function(mapping = NULL, data = NULL,
 offset_x <- function(y, x = rep(1, length(y)), width = 0.4, vary.width = FALSE,
                      max.length = NULL, ...) {
   if (length(x) != length(y)) stop("x and y not the same length in offset_x")
-  
+
   offsets <- vipor::aveWithArgs(
     y, x, 
     FUN = vipor::offsetSingleGroup,
