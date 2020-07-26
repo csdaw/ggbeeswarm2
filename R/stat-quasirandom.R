@@ -15,43 +15,18 @@ StatQuasirandom <- ggproto("StatQuasirandom", Stat,
                              params
                            },
                            
-                           setup_data = function(data, params) {
-                             data <- flip_data(data, params$flipped_aes)
-                             data <- remove_missing(
-                               data,
-                               na.rm = params$na.rm,
-                               vars = "x",
-                               name = "stat_quasirandom"
-                             )
-                             
-                             if(!is.null(params$dodge.width)) {
-                               data <- ggplot2:::collide(
-                                 data,
-                                 params$dodge.width,
-                                 name = "position_quasirandom",
-                                 strategy = ggplot2:::pos_dodge,
-                                 n = NULL,
-                                 check.width = FALSE
-                               )
-                             }
-                             
-                             flip_data(data, params$flipped_aes)
-                           },
-                           
                            extra_params = c("na.rm", "orientation"),
                            
                            compute_group = function(data, scales, flipped_aes = FALSE,
-                                                    width = 0.4, vary.width = FALSE,
+                                                    width = NULL, vary.width = FALSE,
                                                     max.length = NULL, bandwidth = 0.5, 
-                                                    bins = NULL, method = "quasirandom",
-                                                    dodge.width = NULL) {
+                                                    bins = NULL, method = "quasirandom") {
                              data <- flip_data(data, flipped_aes)
                              
-                             # set width if not specified (not sure if this is necessary)
+                             # set width if not specified
                              if (is.null(width)) {
                                width <- ggplot2::resolution(
                                  data$x, zero = FALSE) * 0.4
-                               
                              }
                              
                              x.offset <- offset_x(
@@ -75,14 +50,15 @@ StatQuasirandom <- ggproto("StatQuasirandom", Stat,
 #' @export
 stat_quasirandom <- function(mapping = NULL, data = NULL, 
                              position = "identity", ..., 
-                             width = 0.4, vary.width = FALSE, bandwidth = 0.5,
+                             width = NULL, vary.width = FALSE, bandwidth = 0.5,
                              bins = NULL, method = "quasirandom",
                              dodge.width = NULL,
                              na.rm = FALSE, orientation = NA,
                              show.legend = NA, inherit.aes = TRUE) {
   layer(
     stat = StatQuasirandom, data = data, mapping = mapping, geom = "point", 
-    position = position, show.legend = show.legend, inherit.aes = inherit.aes,
+    position = position, 
+    show.legend = show.legend, inherit.aes = inherit.aes,
     params = list(
       na.rm = na.rm, 
       orientation = orientation,
@@ -91,7 +67,6 @@ stat_quasirandom <- function(mapping = NULL, data = NULL,
       bandwidth = bandwidth,
       bins = bins,
       method = method,
-      dodge.width = dodge.width,
       ...
     )
   )

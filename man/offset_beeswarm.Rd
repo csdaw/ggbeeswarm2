@@ -40,8 +40,5 @@ An internal function to calculate new positions for geom_beeswarm
 }
 \seealso{
 \code{\link{geom_beeswarm}}, \code{\link{position_quasirandom}}, \code{\link[beeswarm]{swarmx}}
-
-Other position adjustments: 
-\code{\link{position_quasirandom}()}
 }
 \concept{position adjustments}

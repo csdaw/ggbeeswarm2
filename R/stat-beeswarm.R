@@ -141,7 +141,7 @@ stat_beeswarm <- function(mapping = NULL, data = NULL,
   
   layer(
     stat = StatBeeswarm, data = data, mapping = mapping, geom = "point", 
-    position = position_beeswarm(width = dodge.width), 
+    position = position, 
     show.legend = show.legend, inherit.aes = inherit.aes,
     params = list(
       na.rm = na.rm,
