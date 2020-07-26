@@ -7,18 +7,18 @@ StatBeeswarm <- ggproto("StatBeeswarm", Stat,
                             group_has_equal = TRUE,
                             main_is_optional = TRUE
                           )
+                          data <- flip_data(data, params$flipped_aes)
                           
                           # define n.groups 
                           params$n.groups <- length(unique(data$group))
                           
                           # get y range of data and extend it a little
-                          if (params$flipped_aes) {
-                            params$y.lim <- grDevices::extendrange(data$x, f = 0.01)
-                          } else {
-                            params$y.lim <- grDevices::extendrange(data$y, f = 0.01)
-                          }
+                          params$y.lim <- grDevices::extendrange(data$y, f = 0.01)
+                          
                           params
                         },
+                        
+                        
                         
                         extra_params = c("na.rm", "orientation"),
                         
@@ -29,17 +29,34 @@ StatBeeswarm <- ggproto("StatBeeswarm", Stat,
                                                  corral = "none", corral.width = 0.889) {
                           data <- flip_data(data, flipped_aes)
                           
+                          # get plot limits
+                          if (flipped_aes) {
+                            plot.ylim.short <- scales$x$get_limits()
+                            plot.ylim <- ggplot2:::expand_range4(scales$x$get_limits(), c(0.045, 0))
+                            plot.xlim <- ggplot2:::expand_range4(c(1, length(scales$y$get_limits())), c(0, 0.6))
+                          } else {
+                            plot.ylim.short <- scales$y$get_limits()
+                            plot.ylim <- ggplot2:::expand_range4(scales$y$get_limits(), c(0.045, 0))
+                            plot.xlim <- ggplot2:::expand_range4(c(1, length(scales$x$get_limits())), c(0, 0.6))
+                          }
+                          
+                          # capture current par values
+                          current.par <- par("usr")
+
                           if (method == "swarm") {
-                          x.offset <- beeswarm::swarmx(
-                            x = rep(0, length(data$y)), y = data$y,
-                            cex = spacing, side = side, priority = priority
-                          )$x
+                            # adjust par("usr") based on input data
+                            par("usr" = c(plot.xlim, plot.ylim.short))
+                            
+                            x.offset <- beeswarm::swarmx(
+                              x = rep(0, length(data$y)), y = data$y,
+                              cex = spacing, side = side, priority = priority
+                            )$x
                           } else {
                             ## non-swarm methods
-
+                            # adjust par("usr") based on input data
+                            par("usr" = c(plot.xlim, plot.ylim))
+                            
                             # define size.x and size.y
-                            sizeMultiplier <- par('cex') * 1 * spacing
-                            print(sizeMultiplier)
                             size.x <- xinch(0.08, warn.log = FALSE) * spacing
                             size.y <- yinch(0.08, warn.log = FALSE) * spacing
                             
@@ -112,9 +129,11 @@ StatBeeswarm <- ggproto("StatBeeswarm", Stat,
                               )
                             }
                           }
-                          data$x.orig <- data$x
-                          data$x.offset <- x.offset
-                          data$x <- data$x + data$x.offset
+                          
+                          data$x <- data$x + x.offset
+                          
+                          # return par("usr") to normal
+                          par("usr" = current.par)
                           
                           flip_data(data, flipped_aes)
                         },
@@ -127,7 +146,6 @@ stat_beeswarm <- function(mapping = NULL, data = NULL,
                           position = "identity", ..., method = "swarm",
                           spacing = 1, breaks = NULL, side = 0L, priority = "ascending",
                           corral = "none", corral.width = 0.889,
-                          dodge.width = NULL,
                           na.rm = FALSE, orientation = NA, 
                           show.legend = NA, inherit.aes = TRUE) {
   stopifnot(method %in% c("swarm", "centre", "center", "hex", "square"))
@@ -141,8 +159,7 @@ stat_beeswarm <- function(mapping = NULL, data = NULL,
   
   layer(
     stat = StatBeeswarm, data = data, mapping = mapping, geom = "point", 
-    position = position, 
-    show.legend = show.legend, inherit.aes = inherit.aes,
+    position = position, show.legend = show.legend, inherit.aes = inherit.aes,
     params = list(
       na.rm = na.rm,
       orientation = orientation,
