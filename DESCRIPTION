@@ -1,17 +1,18 @@
-Package: ggbeeswarm
+Package: ggbeeswarm2
 Type: Package
 Title: Categorical Scatter (Violin Point) Plots
 Version: 0.7.0
 Date: 2019-08-13
 Authors@R: c(
-    person(given="Erik", family="Clarke", role=c("aut", "cre"), email="erikclarke@gmail.com"),
+    person(given="Charlotte", family="Dawson", role=c("aut", "cre"), email="csdaw@outlook.com"),
+    person(given="Erik", family="Clarke", role=c("aut"), email="erikclarke@gmail.com"),
     person(given="Scott", family="Sherrill-Mix", role=c("aut"), email="sherrillmix@gmail.com"))
 Description: Provides two methods of plotting categorical scatter plots such
     that the arrangement of points within a category reflects the density of
     data at that region, and avoids over-plotting.
-URL: https://github.com/eclarke/ggbeeswarm
-BugReports: https://github.com/eclarke/ggbeeswarm/issues
-License: GPL (>=2)
+URL: https://github.com/csdaw/ggbeeswarm2
+BugReports: https://github.com/csdaw/ggbeeswarm2/issues
+License: GPL-3 + file LICENSE
 Depends:
     R (>= 3.0.0),
     ggplot2 (>= 2.0)
