@@ -50,40 +50,41 @@ offset_beeswarm= function(data,xRange=1,yRange=1,priority = c("ascending", "desc
   return(data)
 }
     
-position_beeswarm <- function(width = NULL) {
-  ggproto(NULL, PositionBeeswarm,
-          width = width
-  )
+position_beeswarm <- function (groupOnX=NULL,dodge.width=0){
+  ggplot2::ggproto(NULL,PositionBeeswarm,groupOnX=groupOnX,dodge.width=dodge.width)
 }
 
-PositionBeeswarm <- ggproto("PositionBeeswarm", ggplot2::Position, 
-                            width = NULL,
-                            setup_params = function(self, data) {
-                              flipped_aes <- ggplot2::has_flipped_aes(data)
-                              data <- ggplot2::flip_data(data, flipped_aes)
-                              
-                              list(
-                                width = self$width,
-                                flipped_aes = flipped_aes
-                              )
-                            },
-                            compute_panel = function(data, params, scales) {
-                              data <- flip_data(data, params$flipped_aes)
-                              data$x <- data$x.orig
-                              
-                              collided <- ggplot2:::collide(
-                                data,
-                                params$width,
-                                name = "position_beeswarm",
-                                strategy = ggplot2:::pos_dodge,
-                                n = NULL,
-                                check.width = FALSE
-                              )
-                              collided$x <- collided$x + collided$x.offset
-
-                              flip_data(collided, params$flipped_aes)
-                            },
-                            required_aes=c('x','y')
-                            
-                            
+PositionBeeswarm <- ggplot2::ggproto("PositionBeeswarm",ggplot2:::Position,required_aes=c('x','y'),
+                                     setup_params=function(self,data){
+                                       list(groupOnX=self$groupOnX,dodge.width=self$dodge.width)
+                                     },
+                                     compute_panel= function(data,params,scales){
+                                       data <- remove_missing(data, vars = c("x","y"), name = "position_quasirandom")
+                                       if (nrow(data)==0) return(data.frame())
+                                       
+                                       if(is.null(params$groupOnX)){
+                                         params$groupOnX<-TRUE
+                                         if(length(unique(data$y)) <= length(unique(data$x))) warning('The default behavior of beeswarm has changed in version 0.6.0. In versions <0.6.0, this plot would have been dodged on the y-axis.  In versions >=0.6.0, groupOnX=FALSE must be explicitly set to group on y-axis. Please set groupOnX=TRUE/FALSE to avoid this warning and ensure proper axis choice.')
+                                       }
+                                       
+                                       # dodge
+                                       if(!params$groupOnX){
+                                         data[,c('x','y')]<-data[,c('y','x')]
+                                         origCols<-colnames(data)
+                                       }
+                                       data <- ggplot2:::collide(
+                                         data,
+                                         params$dodge.width,
+                                         "position_dodge",
+                                         ggplot2:::pos_dodge,
+                                         check.width = FALSE
+                                       )
+                                       if(!params$groupOnX){
+                                         data[,c('x','y')]<-data[,c('y','x')]
+                                         #remove x/y min/max created by collide
+                                         data<-data[,origCols]
+                                       }
+                                       return(data)
+                                     }
+                                     
 )
