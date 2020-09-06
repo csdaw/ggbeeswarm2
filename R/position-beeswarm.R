@@ -126,20 +126,18 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
                               # capture current par values
                               current.par <- par("usr")
                               
-                              x.offset <- pos_beeswarm(
-                                df = data, 
+                              data <- pos_beeswarm(
+                                df = data, plot.ylim.short = plot.ylim.short,
                                 plot.xlim = plot.xlim, plot.ylim = plot.ylim,
                                 n.groups = params$n.groups, y.lim = params$y.lim,
-                                method = self$method,
-                                spacing = self$spacing,
-                                breaks = self$breaks,
-                                side = self$side,
-                                priority = self$priority,
-                                corral = self$corral,
-                                corral.width = self$corral.width
+                                method = params$method,
+                                spacing = params$spacing,
+                                breaks = params$breaks,
+                                side = params$side,
+                                priority = params$priority,
+                                corral = params$corral,
+                                corral.width = params$corral.width
                               )
-                              
-                              data$x <- data$x + x.offset
                               
                               # return par("usr") to normal
                               par("usr" = current.par)
@@ -148,13 +146,100 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
                             }
 )
 
-pos_beeswarm <- function(df, plot.xlim, plot.ylim, n.groups, y.lim, 
+pos_beeswarm <- function(df, plot.ylim.short, plot.xlim, plot.ylim, n.groups, y.lim, 
                          method = "swarm", spacing = 1, breaks = NULL,
                          side = 0L, priority = "ascending", corral = "none",
                          corral.width = 0.889) {
   print("made it here")
-  result <- rep(0, nrow(df))
-  result
+  if (method == "swarm") {
+    # adjust par("usr") based on input data
+    par("usr" = c(plot.xlim, plot.ylim.short))
+    
+    x.offset <- beeswarm::swarmx(
+      x = rep(0, length(df$y)), y = df$y,
+      cex = spacing, side = side, priority = priority
+    )$x
+  } else {
+    ## non-swarm methods
+    # adjust par("usr") based on input data
+    par("usr" = c(plot.xlim, plot.ylim))
+    
+    # define size.x and size.y
+    size.x <- xinch(0.08, warn.log = FALSE) * spacing
+    size.y <- yinch(0.08, warn.log = FALSE) * spacing
+    
+    # hex method specific step
+    if (method == "hex") size.y <- size.y * sqrt(3) / 2
+    
+    ## first determine positions along the y axis
+    if(is.null(breaks))
+      breaks <- seq(y.lim[1], y.lim[2] + size.y, by = size.y)
+    
+    if(length(breaks) == 1 && is.na(breaks[1])) {
+      y.index <- df$y
+      d.pos <- df$y
+    } else {
+      mids <- (head(breaks, -1) + tail(breaks, -1)) / 2
+      y.index <- sapply(df$y, cut, breaks = breaks, labels = FALSE)
+      
+      y.pos <- sapply(y.index, function(a) mids[a])  
+      df$y <- y.pos
+    }
+    
+    ## now determine offset along the x axis
+    x.index <- determine_pos(y.index, method, side)
+    
+    x.offset <- x.index * size.x
+  }
+  
+  if (corral != "none") {
+    corral.low <- (side - 1) * corral.width / 2
+    corral.high <- (side + 1) * corral.width / 2
+    
+    if (corral == "gutter") {
+      x.offset <- sapply(
+        x.offset, 
+        function(zz) pmin(corral.high, pmax(corral.low, zz))
+      )
+    }
+    if (corral == "wrap") {
+      if (side == -1L) {
+        # special case with side=-1: reverse the corral to avoid artefacts at zero
+        x.offset <- sapply(
+          x.offset, 
+          function(zz) corral.high - ((corral.high - zz) %% corral.width)
+        )
+      } else {
+        x.offset <- sapply(
+          x.offset, 
+          function(zz) ((zz - corral.low) %% corral.width) + corral.low
+        )
+      }
+    }
+    if (corral == 'random') {
+      x.offset <- sapply(
+        x.offset, 
+        function(zz) ifelse(
+          zz > corral.high | zz < corral.low, 
+          yes = runif(length(zz), corral.low, corral.high), 
+          no = zz
+        )
+      )
+    }
+    if (corral == 'omit') {
+      x.offset <- sapply(
+        x.offset, 
+        function(zz) ifelse(
+          zz > corral.high | zz < corral.low, 
+          yes = NA, 
+          no = zz
+        )
+      )
+    }
+  }
+  
+  df$x <- df$x + x.offset
+  df
 }
 
 # Dodge overlapping interval.
