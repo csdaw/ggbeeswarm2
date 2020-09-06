@@ -13,8 +13,6 @@
 #' @export
 #' @importFrom beeswarm swarmx
 #' @seealso \code{\link{geom_beeswarm}}, \code{\link{position_quasirandom}}, \code{\link[beeswarm]{swarmx}}
-
-
 offset_beeswarm= function(data,xRange=1,yRange=1,priority = c("ascending", "descending", "density", "random", "none"), cex=1, groupOnX=NULL, dodge.width=0, beeswarmArgs=list(),oSize=c(1/200,1/200)){
   # Adjust function is used to calculate new positions (from ggplot2:::Position)
   data <- remove_missing(data, vars = c("x","y"), name = "position_beeswarm")
@@ -49,9 +47,18 @@ offset_beeswarm= function(data,xRange=1,yRange=1,priority = c("ascending", "desc
 
   return(data)
 }
-    
-position_beeswarm <- function (groupOnX=NULL,dodge.width=0){
-  ggplot2::ggproto(NULL,PositionBeeswarm,groupOnX=groupOnX,dodge.width=dodge.width)
+
+#' @export
+position_beeswarm <- function(width = NULL, height = NULL, seed = NA) {
+  if (!is.null(seed) && is.na(seed)) {
+    seed <- sample.int(.Machine$integer.max, 1L)
+  }
+  
+  ggproto(NULL, PositionJitter,
+          width = width,
+          height = height,
+          seed = seed
+  )
 }
 
 PositionBeeswarm <- ggplot2::ggproto("PositionBeeswarm",ggplot2:::Position,required_aes=c('x','y'),
