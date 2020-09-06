@@ -23,9 +23,6 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
                               flipped_aes <- has_flipped_aes(data)
                               data <- flip_data(data, flipped_aes)
                               
-                              # define n.groups 
-                              n.groups <- length(unique(data$group))
-                              
                               # get y range of data and extend it a little
                               y.lim <- grDevices::extendrange(data$y, f = 0.01)
                               
@@ -38,7 +35,6 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
                                 dodge.width = self$dodge.width,
                                 corral = self$corral,
                                 corral.width = self$corral.width,
-                                n.groups = n.groups,
                                 y.lim = y.lim,
                                 flipped_aes = flipped_aes
                               )
@@ -61,53 +57,39 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
                               # capture current par values
                               current.par <- par("usr")
                               
-                              # Adjust the x transformation based on the number of 'dodge' variables
-                              #dodgecols <- intersect(c("fill", "colour", "linetype", "shape", "size", "alpha"), colnames(data))
+                              data <- ggplot2:::collide(
+                                data,
+                                params$dodge.width,
+                                name = "position_beeswarmdodge",
+                                strategy = ggplot2:::pos_dodge,
+                                check.width = FALSE
+                              )
+                              
+                              # split data.frame into list of data.frames
                               if(!is.null(params$dodge.width)) {
-                                data <- ggplot2:::collide(
-                                  data,
-                                  params$dodge.width,
-                                  name = "position_beeswarmdodge",
-                                  strategy = ggplot2:::pos_dodge,
-                                  check.width = FALSE
-                                )
-                                
-                                # split data.frame into list of data.frames
                                 data <- split(data, data$group)
-                                
-                                # perform swarming separately for each data.frame
-                                data <- lapply(
-                                  data,
-                                  pos_beeswarm,
-                                  plot.ylim.short = plot.ylim.short,
-                                  plot.xlim = plot.xlim, plot.ylim = plot.ylim,
-                                  n.groups = params$n.groups, y.lim = params$y.lim,
-                                  method = params$method,
-                                  spacing = params$spacing,
-                                  breaks = params$breaks,
-                                  side = params$side,
-                                  priority = params$priority,
-                                  corral = params$corral,
-                                  corral.width = params$corral.width
-                                )
-                                
-                                # recombine list of data.frames into one
-                                data <- Reduce(rbind, data)
-                                
                               } else {
-                                data <- pos_beeswarm(
-                                  df = data, plot.ylim.short = plot.ylim.short,
-                                  plot.xlim = plot.xlim, plot.ylim = plot.ylim,
-                                  n.groups = params$n.groups, y.lim = params$y.lim,
-                                  method = params$method,
-                                  spacing = params$spacing,
-                                  breaks = params$breaks,
-                                  side = params$side,
-                                  priority = params$priority,
-                                  corral = params$corral,
-                                  corral.width = params$corral.width
-                                )
+                                data <- split(data, data$x)
                               }
+
+                              # perform swarming separately for each data.frame
+                              data <- lapply(
+                                data,
+                                pos_beeswarm,
+                                plot.ylim.short = plot.ylim.short,
+                                plot.xlim = plot.xlim, plot.ylim = plot.ylim,
+                                y.lim = params$y.lim,
+                                method = params$method,
+                                spacing = params$spacing,
+                                breaks = params$breaks,
+                                side = params$side,
+                                priority = params$priority,
+                                corral = params$corral,
+                                corral.width = params$corral.width
+                              )
+                              
+                              # recombine list of data.frames into one
+                              data <- Reduce(rbind, data)
                               
                               # return par("usr") to normal
                               par("usr" = current.par)
@@ -116,11 +98,10 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
                             }
 )
 
-pos_beeswarm <- function(df, plot.ylim.short, plot.xlim, plot.ylim, n.groups, y.lim, 
+pos_beeswarm <- function(df, plot.ylim.short, plot.xlim, plot.ylim, y.lim, 
                          method = "swarm", spacing = 1, breaks = NULL,
                          side = 0L, priority = "ascending", corral = "none",
                          corral.width = 0.2) {
-  print("made it here")
   if (method == "swarm") {
     # adjust par("usr") based on input data
     par("usr" = c(plot.xlim, plot.ylim.short))
@@ -167,7 +148,6 @@ pos_beeswarm <- function(df, plot.ylim.short, plot.xlim, plot.ylim, n.groups, y.
     corral.high <- (side + 1) * corral.width / 2
     
     if (corral == "gutter") {
-      print("alalalalalala")
       x.offset <- sapply(
         x.offset, 
         function(zz) pmin(corral.high, pmax(corral.low, zz))
