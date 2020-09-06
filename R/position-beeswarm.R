@@ -64,37 +64,67 @@ position_beeswarm <- function(method = "swarm", spacing = 1, breaks = NULL,
   )
 }
 
-PositionBeeswarm <- ggplot2::ggproto("PositionBeeswarm",ggplot2:::Position,required_aes=c('x','y'),
-                                     setup_params=function(self,data){
-                                       list(groupOnX=self$groupOnX,dodge.width=self$dodge.width)
-                                     },
-                                     compute_panel= function(data,params,scales){
-                                       data <- remove_missing(data, vars = c("x","y"), name = "position_quasirandom")
-                                       if (nrow(data)==0) return(data.frame())
-                                       
-                                       if(is.null(params$groupOnX)){
-                                         params$groupOnX<-TRUE
-                                         if(length(unique(data$y)) <= length(unique(data$x))) warning('The default behavior of beeswarm has changed in version 0.6.0. In versions <0.6.0, this plot would have been dodged on the y-axis.  In versions >=0.6.0, groupOnX=FALSE must be explicitly set to group on y-axis. Please set groupOnX=TRUE/FALSE to avoid this warning and ensure proper axis choice.')
-                                       }
-                                       
-                                       # dodge
-                                       if(!params$groupOnX){
-                                         data[,c('x','y')]<-data[,c('y','x')]
-                                         origCols<-colnames(data)
-                                       }
-                                       data <- ggplot2:::collide(
-                                         data,
-                                         params$dodge.width,
-                                         "position_dodge",
-                                         ggplot2:::pos_dodge,
-                                         check.width = FALSE
-                                       )
-                                       if(!params$groupOnX){
-                                         data[,c('x','y')]<-data[,c('y','x')]
-                                         #remove x/y min/max created by collide
-                                         data<-data[,origCols]
-                                       }
-                                       return(data)
-                                     }
-                                     
+PositionBeeswarm <- ggproto("PositionDodge", Position,
+                            width = NULL,
+                            preserve = "total",
+                            setup_params = function(self, data) {
+                              flipped_aes <- has_flipped_aes(data)
+                              data <- flip_data(data, flipped_aes)
+                              if (is.null(data$xmin) && is.null(data$xmax) && is.null(self$width)) {
+                                warn("Width not defined. Set with `position_dodge(width = ?)`")
+                              }
+                              if (identical(self$preserve, "total")) {
+                                n <- NULL
+                              } else {
+                                panels <- unname(split(data, data$PANEL))
+                                ns <- vapply(panels, function(panel) max(table(panel$xmin)), double(1))
+                                n <- max(ns)
+                              }
+                              list(
+                                width = self$width,
+                                n = n,
+                                flipped_aes = flipped_aes
+                              )
+                            },
+                            setup_data = function(self, data, params) {
+                              data <- flip_data(data, params$flipped_aes)
+                              if (!"x" %in% names(data) && all(c("xmin", "xmax") %in% names(data))) {
+                                data$x <- (data$xmin + data$xmax) / 2
+                              }
+                              flip_data(data, params$flipped_aes)
+                            },
+                            compute_panel = function(data, params, scales) {
+                              data <- flip_data(data, params$flipped_aes)
+                              collided <- collide(
+                                data,
+                                params$width,
+                                name = "position_dodge",
+                                strategy = pos_dodge,
+                                n = params$n,
+                                check.width = FALSE
+                              )
+                              flip_data(collided, params$flipped_aes)
+                            }
 )
+# Dodge overlapping interval.
+# Assumes that each set has the same horizontal position.
+pos_dodge <- function(df, width, n = NULL) {
+  if (is.null(n)) {
+    n <- length(unique(df$group))
+  }
+  if (n == 1)
+    return(df)
+  if (!all(c("xmin", "xmax") %in% names(df))) {
+    df$xmin <- df$x
+    df$xmax <- df$x
+  }
+  d_width <- max(df$xmax - df$xmin)
+  # Have a new group index from 1 to number of groups.
+  # This might be needed if the group numbers in this set don't include all of 1:n
+  groupidx <- match(df$group, sort(unique(df$group)))
+  # Find the center for each group, then use that to calculate xmin and xmax
+  df$x <- df$x + width * ((groupidx - 0.5) / n - .5)
+  df$xmin <- df$x - d_width / n / 2
+  df$xmax <- df$x + d_width / n / 2
+  df
+}
