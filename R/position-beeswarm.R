@@ -53,7 +53,7 @@ position_beeswarm <- function(method = "swarm", spacing = 1, breaks = NULL,
                               side = 0L, priority = "ascending",
                               corral = "none", corral.width = 0.889) {
   
-  ggproto(NULL, PositionBeeswwarm,
+  ggproto(NULL, PositionBeeswarm,
           method = method,
           spacing = spacing,
           breaks = breaks,
@@ -64,46 +64,45 @@ position_beeswarm <- function(method = "swarm", spacing = 1, breaks = NULL,
   )
 }
 
-PositionBeeswarm <- ggproto("PositionDodge", Position,
-                            width = NULL,
-                            preserve = "total",
+PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
+                            method = "swarm", spacing = 1, breaks = NULL,
+                            side = 0L, priority = "ascending", corral = "none",
+                            corral.width = 0.889,
+                            
                             setup_params = function(self, data) {
                               flipped_aes <- has_flipped_aes(data)
                               data <- flip_data(data, flipped_aes)
-                              if (is.null(data$xmin) && is.null(data$xmax) && is.null(self$width)) {
-                                warn("Width not defined. Set with `position_dodge(width = ?)`")
-                              }
-                              if (identical(self$preserve, "total")) {
-                                n <- NULL
-                              } else {
-                                panels <- unname(split(data, data$PANEL))
-                                ns <- vapply(panels, function(panel) max(table(panel$xmin)), double(1))
-                                n <- max(ns)
-                              }
+                              
+                              # define n.groups 
+                              n.groups <- length(unique(data$group))
+                              
+                              # get y range of data and extend it a little
+                              y.lim <- grDevices::extendrange(data$y, f = 0.01)
+                              
                               list(
-                                width = self$width,
-                                n = n,
+                                method = self$method,
+                                spacing = self$spacing,
+                                breaks = self$breaks,
+                                side = self$side,
+                                priority = self$priority,
+                                corral = self$corral,
+                                corral.width = self$corral.width,
+                                n.groups = n.groups,
+                                y.lim = y.lim,
                                 flipped_aes = flipped_aes
                               )
                             },
-                            setup_data = function(self, data, params) {
-                              data <- flip_data(data, params$flipped_aes)
-                              if (!"x" %in% names(data) && all(c("xmin", "xmax") %in% names(data))) {
-                                data$x <- (data$xmin + data$xmax) / 2
-                              }
-                              flip_data(data, params$flipped_aes)
-                            },
+                            # setup_data = function(self, data, params) {
+                            #   data <- flip_data(data, params$flipped_aes)
+                            #   if (!"x" %in% names(data) && all(c("xmin", "xmax") %in% names(data))) {
+                            #     data$x <- (data$xmin + data$xmax) / 2
+                            #   }
+                            #   flip_data(data, params$flipped_aes)
+                            # },
                             compute_panel = function(data, params, scales) {
                               data <- flip_data(data, params$flipped_aes)
-                              collided <- collide(
-                                data,
-                                params$width,
-                                name = "position_dodge",
-                                strategy = pos_dodge,
-                                n = params$n,
-                                check.width = FALSE
-                              )
-                              flip_data(collided, params$flipped_aes)
+                              print(params)
+                              flip_data(data, params$flipped_aes)
                             }
 )
 # Dodge overlapping interval.
