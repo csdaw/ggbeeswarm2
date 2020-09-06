@@ -19,8 +19,8 @@ knitr::opts_chunk$set(
 
 This is a fork of ggbeeswarm under active development. 
 
-A new function `stat_beeswarm` function has been 
-written which is compatible with R >= v4.0.0. Additionally, `stat_beeswarm` 
+The `position_beeswarm` function has been 
+rewritten and is compatible with R >= v4.0.0. Additionally, `position_beeswarm` 
 works almost identically to the `beeswarm` function from the 
 [beeswarm](https://cran.r-project.org/web/packages/beeswarm/index.html) package.
 
@@ -49,7 +49,7 @@ distro2 <- as.data.frame(rev(distro)) %>%
     )
 
  ggplot2::ggplot(distro2, aes(x = rev(variable), y = value)) + 
-   ggbeeswarm2::stat_beeswarm(method = "hex") + 
+   geom_point(position = ggbeeswarm2::position_beeswarm(method = "hex")) + 
    scale_y_continuous(limits = c(-3, 3)) + 
    theme(
      plot.margin = unit(c(0.11, 0.07, 0.11, 0.07), "npc")
