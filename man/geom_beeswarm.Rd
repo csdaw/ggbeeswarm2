@@ -39,14 +39,6 @@ the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data. A \code{function} can be created
 from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 
-\item{priority}{Method used to perform point layout (see \code{\link{swarmx}})}
-
-\item{groupOnX}{if TRUE then jitter is added to the x axis and if FALSE jitter is added to the y axis. Prior to v0.6.0, the default NULL causes the function to guess which axis is the categorical one based on the number of unique entries in each. This could result in unexpected results when the x variable has few unique values and so in v0.6.0 the default was changed to always jitter on the x axis unless groupOnX=FALSE. Also consider \code{\link[ggplot2]{coord_flip}}.}
-
-\item{dodge.width}{Amount by which points from different aesthetic groups will be dodged. This requires that one of the aesthetics is a factor.}
-
-\item{beeswarmArgs}{A list of additional arguments to be passed to the \link{swarmx} function of beeswarm e.g. \code{list(side=1)} or \code{list(side=-1)} to only distribute points to the right/left side}
-
 \item{stat}{The statistical transformation to use on the data for this
 layer, as a string.}
 
