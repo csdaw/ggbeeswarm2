@@ -99,12 +99,64 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
                             #   }
                             #   flip_data(data, params$flipped_aes)
                             # },
+                            # compute_layer = function(self, data, params, layout) {
+                            #   print("compute layer!")
+                            #   print(layout)
+                            #   print(data)
+                            #   trans_x <- if (0.2 > 0) function(x) jitter(x, amount = 0.2)
+                            #   trans_y <- if (0.2 > 0) function(x) jitter(x, amount = 0.2)
+                            #   
+                            #   ggplot2:::with_seed_null(123, ggplot2:::transform_position(data, trans_x, trans_y))
+                            # },
+                            
                             compute_panel = function(data, params, scales) {
                               data <- flip_data(data, params$flipped_aes)
-                              print(params)
+                              
+                              # get plot limits
+                              if (params$flipped_aes) {
+                                plot.ylim.short <- scales$x$get_limits()
+                                plot.ylim <- ggplot2:::expand_range4(scales$x$get_limits(), c(0.045, 0))
+                                plot.xlim <- ggplot2:::expand_range4(c(1, length(scales$y$get_limits())), c(0, 0.6))
+                              } else {
+                                plot.ylim.short <- scales$y$get_limits()
+                                plot.ylim <- ggplot2:::expand_range4(scales$y$get_limits(), c(0.045, 0))
+                                plot.xlim <- ggplot2:::expand_range4(c(1, length(scales$x$get_limits())), c(0, 0.6))
+                              }
+                              
+                              # capture current par values
+                              current.par <- par("usr")
+                              
+                              x.offset <- pos_beeswarm(
+                                df = data, 
+                                plot.xlim = plot.xlim, plot.ylim = plot.ylim,
+                                n.groups = params$n.groups, y.lim = params$y.lim,
+                                method = self$method,
+                                spacing = self$spacing,
+                                breaks = self$breaks,
+                                side = self$side,
+                                priority = self$priority,
+                                corral = self$corral,
+                                corral.width = self$corral.width
+                              )
+                              
+                              data$x <- data$x + x.offset
+                              
+                              # return par("usr") to normal
+                              par("usr" = current.par)
+                              
                               flip_data(data, params$flipped_aes)
                             }
 )
+
+pos_beeswarm <- function(df, plot.xlim, plot.ylim, n.groups, y.lim, 
+                         method = "swarm", spacing = 1, breaks = NULL,
+                         side = 0L, priority = "ascending", corral = "none",
+                         corral.width = 0.889) {
+  print("made it here")
+  result <- rep(0, nrow(df))
+  result
+}
+
 # Dodge overlapping interval.
 # Assumes that each set has the same horizontal position.
 pos_dodge <- function(df, width, n = NULL) {
