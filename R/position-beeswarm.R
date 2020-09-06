@@ -49,15 +49,18 @@ offset_beeswarm= function(data,xRange=1,yRange=1,priority = c("ascending", "desc
 }
 
 #' @export
-position_beeswarm <- function(width = NULL, height = NULL, seed = NA) {
-  if (!is.null(seed) && is.na(seed)) {
-    seed <- sample.int(.Machine$integer.max, 1L)
-  }
+position_beeswarm <- function(method = "swarm", spacing = 1, breaks = NULL,
+                              side = 0L, priority = "ascending",
+                              corral = "none", corral.width = 0.889) {
   
-  ggproto(NULL, PositionJitter,
-          width = width,
-          height = height,
-          seed = seed
+  ggproto(NULL, PositionBeeswwarm,
+          method = method,
+          spacing = spacing,
+          breaks = breaks,
+          side = side, 
+          priority = priority,
+          corral = corral,
+          corral.width = corral.width
   )
 }
 
