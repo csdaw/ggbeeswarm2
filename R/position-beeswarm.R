@@ -191,3 +191,33 @@ pos_beeswarm <- function(df, plot.ylim.short, plot.xlim, plot.ylim, y.lim,
   df$x <- df$x + x.offset
   df
 }
+
+determine_pos <- function(v, method, side) {
+  if(length(na.omit(v)) == 0) 
+    return(v)
+  
+  v.s <- lapply(split(v, v), seq_along)
+  
+  if(method %in% c("centre", "square") && side == -1)
+    v.s <- lapply(v.s, function(a) a - max(a))
+  else if(method %in% c("centre", "square") && side == 1)
+    v.s <- lapply(v.s, function(a) a - 1)
+  else if(method == "centre")
+    v.s <- lapply(v.s, function(a) a - mean(a))
+  else if(method == "square")
+    v.s <- lapply(v.s, function(a) a - floor(mean(a)))
+  else if(method == "hex") {
+    odd.row <- (as.numeric(names(v.s)) %% 2) == 1
+    if(side == 0) {
+      v.s[ odd.row] <- lapply(v.s[ odd.row], function(a) a - floor(mean(a)) - 0.25)
+      v.s[!odd.row] <- lapply(v.s[!odd.row], function(a) a - ceiling(mean(a)) + 0.25)
+    } else if(side == -1) {
+      v.s[ odd.row] <- lapply(v.s[ odd.row], function(a) a - max(a))
+      v.s[!odd.row] <- lapply(v.s[!odd.row], function(a) a - max(a) - 0.5)
+    } else if(side ==  1) {
+      v.s[ odd.row] <- lapply(v.s[ odd.row], function(a) a - 1)
+      v.s[!odd.row] <- lapply(v.s[!odd.row], function(a) a - 0.5)
+    }
+  }
+  unsplit(v.s, v)
+}

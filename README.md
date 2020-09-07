@@ -50,7 +50,7 @@ distro2 <- as.data.frame(rev(distro)) %>%
     )
 
  ggplot2::ggplot(distro2, aes(x = rev(variable), y = value)) + 
-   geom_point(position = ggbeeswarm2::position_beeswarm(method = "hex")) + 
+   geom_beeswarm(method = "hex") + 
    scale_y_continuous(limits = c(-3, 3)) + 
    theme(
      plot.margin = unit(c(0.11, 0.07, 0.11, 0.07), "npc")
