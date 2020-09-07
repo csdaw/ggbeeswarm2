@@ -3,7 +3,6 @@ position_beeswarm <- function(method = "swarm", spacing = 1, breaks = NULL,
                               side = 0L, priority = "ascending",
                               dodge.width = NULL,
                               corral = "none", corral.width = 0.2) {
-  
   ggproto(NULL, PositionBeeswarm,
           method = method,
           spacing = spacing,
@@ -60,7 +59,7 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
                               data <- ggplot2:::collide(
                                 data,
                                 params$dodge.width,
-                                name = "position_beeswarmdodge",
+                                name = "position_beeswarm",
                                 strategy = ggplot2:::pos_dodge,
                                 check.width = FALSE
                               )

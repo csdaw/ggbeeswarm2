@@ -13,6 +13,9 @@ Description: Provides two methods of plotting categorical scatter plots such
 URL: https://github.com/csdaw/ggbeeswarm2
 BugReports: https://github.com/csdaw/ggbeeswarm2/issues
 License: GPL-3 + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.1
 Depends:
     R (>= 3.0.0),
     ggplot2 (>= 2.0)
@@ -21,4 +24,3 @@ Imports:
     vipor
 Suggests:
     gridExtra
-RoxygenNote: 7.1.1
