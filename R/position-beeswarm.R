@@ -1,12 +1,63 @@
+#' Separate coincident points with the beeswarm package
+#' 
+#' @description Offset points to avoid overplotting using the 
+#' \code{\link{swarmx}} function from the `beeswarm` package.
+#' 
+#' @details 
+#' **method:** specifies the algorithm used to avoid overlapping points. The 
+#' default `"swarm"` method places points in increasing order. If a point would
+#' overlap with an existing point, it is shifted sideways (along the group axis)
+#' by a minimal amount sufficient to avoid overlap. 
+#' 
+#' The other 3 methods first discretise the values along the data axis, in order
+#' to create more efficient packing. The `"square"` method places points on a 
+#' square grid, whereas `"hex"` uses a hexagonal grid. `"centre"` uses a square grid
+#' to produce a symmetric swarm. The number of break points for discretisation
+#' is determined by a combination of the available plotting area and the 
+#' `spacing` argument.
+#' 
+#' **priority:** controls the order in which points are placed, which generally 
+#' has a noticeable effect on the plot appearance. `"ascending"` gives the 
+#' 'traditional' beeswarm plot. `"descending"` is the opposite. `"density"` 
+#' prioritizes points with higher local density. `"random"` places points in a 
+#' random order. `"none"` places points in the order provided.
+#' 
+#' **corral:** By default, swarms from different groups are not prevented from
+#' overlapping, i.e. `"corral = "none"`. Thus, datasets that are very large or 
+#' unevenly distributed may produce ugly overlapping beeswarms. To control 
+#' runaway points one can use the following methods. `"gutter"` collects runaway
+#' points along the boundary between groups. `"wrap"` implement periodic boundaries.
+#' `"random"` places runaway points randomly in the region. `"omit"` omits runaway
+#' points.
+#'
+#' @param method `string`. Method for arranging points, default is `"swarm"`. See
+#' details below.
+#' @param spacing `numeric`. Relative spacing between points, default is `1`. 
+#' You should adjust this if you change the size of the points. Generally the
+#' spacing should be 2/3 of the point size i.e. if `size = 3`, then `spacing = 2`,
+#' but this is ultimately up to personal preference.
+#' @param side `integer`. Direction to perform jittering: use `0L` for both directions;
+#' `1L` for right/upwards; `-1L` for left/downwards.
+#' @param priority `string`. Method used to perform point layout, default is 
+#' `"ascending"`. See details below.
+#' @param dodge.width `numeric`. Amount to dodge points from different aesthetic
+#' groups, default is `NULL` for no dodging.
+#' @param corral `string`. Method used to adjust points that would be placed to
+#' wide horizontally, default is `"none"`. See details below.
+#' @param corral.width `numeric`. Width of the corral, default is `0.2`.
+#' 
+#' @seealso \link{position_quasirandom}
+#'
+#' @examples
+#' #
 #' @export
-position_beeswarm <- function(method = "swarm", spacing = 1, breaks = NULL,
+position_beeswarm <- function(method = "swarm", spacing = 1,
                               side = 0L, priority = "ascending",
                               dodge.width = NULL,
                               corral = "none", corral.width = 0.2) {
   ggproto(NULL, PositionBeeswarm,
           method = method,
           spacing = spacing,
-          breaks = breaks,
           side = side, 
           priority = priority,
           dodge.width = dodge.width,
@@ -28,7 +79,6 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
                               list(
                                 method = self$method,
                                 spacing = self$spacing,
-                                breaks = self$breaks,
                                 side = self$side,
                                 priority = self$priority,
                                 dodge.width = self$dodge.width,
@@ -45,22 +95,22 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
                               # get plot limits
                               if (params$flipped_aes) {
                                 plot.ylim.short <- scales$x$get_limits()
-                                plot.ylim <- ggplot2:::expand_range4(scales$x$get_limits(), c(0.045, 0))
-                                plot.xlim <- ggplot2:::expand_range4(c(1, length(scales$y$get_limits())), c(0, 0.6))
+                                plot.ylim <- .beeint$expand_range4(scales$x$get_limits(), c(0.045, 0))
+                                plot.xlim <- .beeint$expand_range4(c(1, length(scales$y$get_limits())), c(0, 0.6))
                               } else {
                                 plot.ylim.short <- scales$y$get_limits()
-                                plot.ylim <- ggplot2:::expand_range4(scales$y$get_limits(), c(0.045, 0))
-                                plot.xlim <- ggplot2:::expand_range4(c(1, length(scales$x$get_limits())), c(0, 0.6))
+                                plot.ylim <- .beeint$expand_range4(scales$y$get_limits(), c(0.045, 0))
+                                plot.xlim <- .beeint$expand_range4(c(1, length(scales$x$get_limits())), c(0, 0.6))
                               }
                               
                               # capture current par values
-                              current.par <- par("usr")
+                              current.par <- graphics::par("usr")
                               
-                              data <- ggplot2:::collide(
+                              data <- .beeint$collide(
                                 data,
                                 params$dodge.width,
                                 name = "position_beeswarm",
-                                strategy = ggplot2:::pos_dodge,
+                                strategy = .beeint$pos_dodge,
                                 check.width = FALSE
                               )
                               
@@ -80,7 +130,6 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
                                 y.lim = params$y.lim,
                                 method = params$method,
                                 spacing = params$spacing,
-                                breaks = params$breaks,
                                 side = params$side,
                                 priority = params$priority,
                                 corral = params$corral,
@@ -91,19 +140,19 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
                               data <- Reduce(rbind, data)
                               
                               # return par("usr") to normal
-                              par("usr" = current.par)
+                              graphics::par("usr" = current.par)
                               
                               flip_data(data, params$flipped_aes)
                             }
 )
 
 pos_beeswarm <- function(df, plot.ylim.short, plot.xlim, plot.ylim, y.lim, 
-                         method = "swarm", spacing = 1, breaks = NULL,
+                         method = "swarm", spacing = 1,
                          side = 0L, priority = "ascending", corral = "none",
                          corral.width = 0.2) {
   if (method == "swarm") {
     # adjust par("usr") based on input data
-    par("usr" = c(plot.xlim, plot.ylim.short))
+    graphics::par("usr" = c(plot.xlim, plot.ylim.short))
     
     x.offset <- beeswarm::swarmx(
       x = rep(0, length(df$y)), y = df$y,
@@ -112,29 +161,23 @@ pos_beeswarm <- function(df, plot.ylim.short, plot.xlim, plot.ylim, y.lim,
   } else {
     ## non-swarm methods
     # adjust par("usr") based on input data
-    par("usr" = c(plot.xlim, plot.ylim))
+    graphics::par("usr" = c(plot.xlim, plot.ylim))
     
     # define size.x and size.y
-    size.x <- xinch(0.08, warn.log = FALSE) * spacing
-    size.y <- yinch(0.08, warn.log = FALSE) * spacing
+    size.x <- graphics::xinch(0.08, warn.log = FALSE) * spacing
+    size.y <- graphics::yinch(0.08, warn.log = FALSE) * spacing
     
     # hex method specific step
     if (method == "hex") size.y <- size.y * sqrt(3) / 2
     
     ## first determine positions along the y axis
-    if(is.null(breaks))
-      breaks <- seq(y.lim[1], y.lim[2] + size.y, by = size.y)
+    breaks <- seq(y.lim[1], y.lim[2] + size.y, by = size.y)
     
-    if(length(breaks) == 1 && is.na(breaks[1])) {
-      y.index <- df$y
-      d.pos <- df$y
-    } else {
-      mids <- (head(breaks, -1) + tail(breaks, -1)) / 2
-      y.index <- sapply(df$y, cut, breaks = breaks, labels = FALSE)
-      
-      y.pos <- sapply(y.index, function(a) mids[a])  
-      df$y <- y.pos
-    }
+    mids <- (utils::head(breaks, -1) + utils::tail(breaks, -1)) / 2
+    y.index <- sapply(df$y, cut, breaks = breaks, labels = FALSE)
+    
+    y.pos <- sapply(y.index, function(a) mids[a])  
+    df$y <- y.pos
     
     ## now determine offset along the x axis
     x.index <- determine_pos(y.index, method, side)
@@ -171,7 +214,7 @@ pos_beeswarm <- function(df, plot.ylim.short, plot.xlim, plot.ylim, y.lim,
         x.offset, 
         function(zz) ifelse(
           zz > corral.high | zz < corral.low, 
-          yes = runif(length(zz), corral.low, corral.high), 
+          yes = stats::runif(length(zz), corral.low, corral.high), 
           no = zz
         )
       )
@@ -193,7 +236,7 @@ pos_beeswarm <- function(df, plot.ylim.short, plot.xlim, plot.ylim, y.lim,
 }
 
 determine_pos <- function(v, method, side) {
-  if(length(na.omit(v)) == 0) 
+  if(length(stats::na.omit(v)) == 0) 
     return(v)
   
   v.s <- lapply(split(v, v), seq_along)

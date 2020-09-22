@@ -45,11 +45,11 @@ PositionQuasirandom <- ggproto("PositionQuasirandom", Position,
                                      data$x, zero = FALSE) * 0.4
                                  }
                                  
-                                 data <- ggplot2:::collide(
+                                 data <- .beeint$collide(
                                    data,
                                    params$dodge.width,
                                    name = "position_quasirandom",
-                                   strategy = ggplot2:::pos_dodge,
+                                   strategy = .beeint$pos_dodge,
                                    check.width = FALSE
                                  )
                                  

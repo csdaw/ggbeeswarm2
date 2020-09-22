@@ -1,7 +1,7 @@
 #' @export
 geom_beeswarm <- function(mapping = NULL, data = NULL,
                           stat = "identity", ...,
-                          method = "swarm", spacing = 1, breaks = NULL,
+                          method = "swarm", spacing = 1,
                           side = 0L, priority = "ascending",
                           dodge.width = NULL, corral = "none", corral.width = 0.2,
                           na.rm = FALSE,
@@ -10,7 +10,6 @@ geom_beeswarm <- function(mapping = NULL, data = NULL,
   position <- position_beeswarm(
     method = method,
     spacing = spacing,
-    breaks = breaks,
     side = side, 
     priority = priority,
     dodge.width = dodge.width,
