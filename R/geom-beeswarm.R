@@ -1,3 +1,35 @@
+#' Beeswarm points
+#' 
+#' @description The beeswarm geom is a convenient shortcut for 
+#' `geom_point(position = "beeswarm")`. It shifts points horizontally to avoid 
+#' overplotting using the \code{\link{swarmx}} function from the `beeswarm` 
+#' package.
+#' 
+#' @inheritParams ggplot2::layer
+#' @inheritParams ggplot2::geom_point
+#' @inheritParams position_beeswarm
+#' @inherit position_beeswarm details
+#' @section Aesthetics:
+#' `geom_beeswarm()` understands the following aesthetics (required aesthetics
+#' are in bold):
+#' - **x**
+#' - **y**
+#' - alpha
+#' - colour
+#' - fill
+#' - group
+#' - shape
+#' - size
+#' - stroke
+#' 
+#' Learn more about setting these aesthetics in `vignette("ggplot2-specs")`.
+#' 
+#' @seealso [position_beeswarm()] for the underlying function to this geom. 
+#' [geom_quasirandom()] for another method of shifting points to avoid
+#' overplotting.
+#'
+#' @examples
+#' #
 #' @export
 geom_beeswarm <- function(mapping = NULL, data = NULL,
                           stat = "identity", ...,
