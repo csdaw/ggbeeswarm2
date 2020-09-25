@@ -1,3 +1,49 @@
+#' Separate coincident points with the vipor package
+#' 
+#' @description Offset points to avoid overplotting using the 
+#' \code{\link{offsetSingleGroup}} function from the `vipor` package.
+#' 
+#' @details 
+#' **method:** specifies the algorithm used to distribute the points. 
+#' 
+#' `"quasirandom"`: points are distributed within a kernel density estimate of
+#' the distribution with offset determined by quasirandom Van de Corput noise.
+#' 
+#' `"pseudorandom"`: points are distributed within a kernel density estimate of 
+#' the distribution with offset determined by pseudorandom noise a la jitter.
+#' 
+#' `"maxout"`: points are distributed within a kernel density with points in a 
+#' band distributed with highest value points on the outside and lowest in 
+#' the middle.
+#' 
+#' `"minout"`: points are distributed within a kernel density with points in a 
+#' band distributed with highest value points in the middle and lowest on 
+#' the outside.
+#' 
+#' `"tukey"`: points are distributed as described in Tukey and Tukey, 
+#' "Strips displaying empirical distributions: I. textured dot strips".
+#' 
+#' `"tukeyDense"`: points are distributed as described in Tukey and Tukey but 
+#' are constrained with the kernel density estimate.
+#'
+#' @param method `string`. Method for arranging points, default is 
+#' `"quasirandom"`. See details below.
+#' @param width `numeric`. Maximum spacing away from the centre for each group
+#' of points, default is `1`.
+#' @param varwidth `boolean`. Adjust the width of each group based on the number
+#' of points in the group. Default is `FALSE`.
+#' @param bandwidth `numeric`. Specifies the bandwidth used to calculate the
+#' kernel density, default is `1`. Smaller values = tighter fit. larger values
+#' = looser fit.
+#' @param nbins `integer` The number of points used to calculate density 
+#' (default is `1000` for quasirandom and pseudorandom, and 100 for others).
+#' @param dodge.width `numeric`. Amount to dodge points from different aesthetic
+#' groups, default is `NULL` for no dodging.
+#' 
+#' @seealso [position_beeswarm()]
+#'
+#' @examples
+#' #
 #' @export
 position_quasirandom <- function(method = "quasirandom",
                                  width = NULL, varwidth = FALSE,

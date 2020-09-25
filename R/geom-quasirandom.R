@@ -1,3 +1,35 @@
+#' Quasirandom points
+#' 
+#' @description The quasirandom geom is a convenient shortcut for 
+#' `geom_point(position = "quasirandom")`. It shifts points to avoid 
+#' overplotting using the \code{\link{offsetSingleGroup}} function from the 
+#' `vipor` package.
+#' 
+#' @inheritParams ggplot2::layer
+#' @inheritParams ggplot2::geom_point
+#' @inheritParams position_quasirandom
+#' @inherit position_quasirandom details
+#' @section Aesthetics:
+#' `geom_quasirandom()` understands the following aesthetics (required aesthetics
+#' are in bold):
+#' - **x**
+#' - **y**
+#' - alpha
+#' - colour
+#' - fill
+#' - group
+#' - shape
+#' - size
+#' - stroke
+#' 
+#' Learn more about setting these aesthetics in `vignette("ggplot2-specs")`.
+#' 
+#' @seealso [position_quasirandom()] for the underlying function to this geom. 
+#' [geom_beeswarm()] for another method of shifting points to avoid
+#' overplotting.
+#'
+#' @examples
+#' #
 #' @export
 geom_quasirandom <- function(mapping = NULL, data = NULL,
                              stat = "identity", ..., 

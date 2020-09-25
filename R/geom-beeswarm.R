@@ -1,7 +1,7 @@
 #' Beeswarm points
 #' 
 #' @description The beeswarm geom is a convenient shortcut for 
-#' `geom_point(position = "beeswarm")`. It shifts points horizontally to avoid 
+#' `geom_point(position = "beeswarm")`. It shifts points to avoid 
 #' overplotting using the \code{\link{swarmx}} function from the `beeswarm` 
 #' package.
 #' 

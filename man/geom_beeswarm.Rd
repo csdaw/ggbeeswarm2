@@ -88,7 +88,7 @@ the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 }
 \description{
 The beeswarm geom is a convenient shortcut for
-\code{geom_point(position = "beeswarm")}. It shifts points horizontally to avoid
+\code{geom_point(position = "beeswarm")}. It shifts points to avoid
 overplotting using the \code{\link{swarmx}} function from the \code{beeswarm}
 package.
 }

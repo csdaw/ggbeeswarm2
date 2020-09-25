@@ -72,5 +72,5 @@ points.
 #
 }
 \seealso{
-\link{position_quasirandom}
+\code{\link[=position_quasirandom]{position_quasirandom()}}
 }

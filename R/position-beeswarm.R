@@ -46,7 +46,7 @@
 #' wide horizontally, default is `"none"`. See details below.
 #' @param corral.width `numeric`. Width of the corral, default is `0.2`.
 #' 
-#' @seealso \link{position_quasirandom}
+#' @seealso [position_quasirandom()]
 #'
 #' @examples
 #' #
