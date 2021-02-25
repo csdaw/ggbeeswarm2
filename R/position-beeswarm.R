@@ -140,7 +140,7 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
                               data <- Reduce(rbind, data)
                               
                               # return par("usr") to normal
-                              graphics::par("usr" = current.par)
+                              on.exit(graphics::par("usr" = current.par))
                               
                               flip_data(data, params$flipped_aes)
                             }
