@@ -12,7 +12,7 @@ Description: Provides two methods of plotting categorical scatter plots such
     data at that region, and avoids over-plotting.
 URL: https://github.com/csdaw/ggbeeswarm2
 BugReports: https://github.com/csdaw/ggbeeswarm2/issues
-License: GPL-3 + file LICENSE
+License: GPL (>= 3.0)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
