@@ -105,6 +105,8 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
                               
                               # capture current par values
                               current.par <- graphics::par("usr")
+                              # on exit return par("usr") to normal
+                              on.exit(graphics::par("usr" = current.par), add = TRUE)
                               
                               data <- .beeint$collide(
                                 data,
@@ -139,8 +141,7 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
                               # recombine list of data.frames into one
                               data <- Reduce(rbind, data)
                               
-                              # return par("usr") to normal
-                              on.exit(graphics::par("usr" = current.par))
+
                               
                               flip_data(data, params$flipped_aes)
                             }
