@@ -5,6 +5,7 @@
 
 <!-- badges: start -->
 
+[![R-CMD-check](https://github.com/csdaw/ggbeeswarm2/workflows/R-CMD-check/badge.svg)](https://github.com/csdaw/ggbeeswarm2/actions)
 [![Codecov test
 coverage](https://codecov.io/gh/csdaw/ggbeeswarm2/branch/master/graph/badge.svg)](https://codecov.io/gh/csdaw/ggbeeswarm2?branch=master)
 <!-- badges: end -->
