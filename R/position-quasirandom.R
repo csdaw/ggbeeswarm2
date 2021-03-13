@@ -88,7 +88,7 @@ PositionQuasirandom <- ggproto("PositionQuasirandom", Position,
                                  # set width if not specified
                                  if (is.null(params$width)) {
                                    params$width <- ggplot2::resolution(
-                                     data$x, zero = FALSE) * 0.1
+                                     data$x, zero = FALSE) * 0.05
                                  }
                                  
                                  data <- .beeint$collide(
