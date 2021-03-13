@@ -27,4 +27,6 @@ Imports:
     stats,
     utils,
     vipor
-Suggests: tinytest
+Suggests: 
+    tinytest,
+    covr

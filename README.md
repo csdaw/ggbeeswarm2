@@ -3,12 +3,18 @@
 
 # ggbeeswarm2: Beeswarm-style plots with ggplot2
 
+<!-- badges: start -->
+
+[![Codecov test
+coverage](https://codecov.io/gh/csdaw/ggbeeswarm2/branch/master/graph/badge.svg)](https://codecov.io/gh/csdaw/ggbeeswarm2?branch=master)
+<!-- badges: end -->
+
 ## Note
 
 This is a fork of ggbeeswarm under active development.
 
 The `position_beeswarm` function has been rewritten and is compatible
-with R \>= v4.0.0. Additionally, `position_beeswarm` works almost
+with R &gt;= v4.0.0. Additionally, `position_beeswarm` works almost
 identically to the `beeswarm` function from the
 [beeswarm](https://cran.r-project.org/web/packages/beeswarm/index.html)
 package.
@@ -25,23 +31,15 @@ beeswarm::beeswarm(distro,
                    col = 2:3, pch = 16,
                    method = "hex",
                    main = "title")
-```
 
-    ## [1] "-3.05587006024551 dlim!" "3.02523735994007 dlim!" 
-    ## [1] 0.01680672
-    ## [1] 0.01680672
-
-<img src="man/figures/README-ex-1.png" width="576" />
-
-    ## [1] 0.03630252
-    ## [1] 1
-    ## [1] 0.03630252
-
-``` r
 # ggbeeswarm2
 library(dplyr)
 library(ggbeeswarm2)
+```
 
+<img src="man/figures/README-ex-1.png" width="576" />
+
+``` r
 distro2 <- as.data.frame(rev(distro)) %>% 
   tidyr::pivot_longer(
     everything(), 
@@ -59,7 +57,7 @@ distro2 <- as.data.frame(rev(distro)) %>%
 
 <img src="man/figures/README-ex-2.png" width="576" />
 
------
+------------------------------------------------------------------------
 
 Author: Charlotte Dawson
 

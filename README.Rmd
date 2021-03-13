@@ -15,6 +15,10 @@ knitr::opts_chunk$set(
 
 # ggbeeswarm2: Beeswarm-style plots with ggplot2
 
+<!-- badges: start -->
+[![Codecov test coverage](https://codecov.io/gh/csdaw/ggbeeswarm2/branch/master/graph/badge.svg)](https://codecov.io/gh/csdaw/ggbeeswarm2?branch=master)
+<!-- badges: end -->
+
 ## Note
 
 This is a fork of ggbeeswarm under active development. 
