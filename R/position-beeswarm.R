@@ -237,8 +237,8 @@ pos_beeswarm <- function(df, plot.ylim.short, plot.xlim, plot.ylim, y.lim,
 }
 
 determine_pos <- function(v, method, side) {
-  if(length(stats::na.omit(v)) == 0) 
-    return(v)
+  # if(length(stats::na.omit(v)) == 0) 
+  #   return(v)
   
   v.s <- lapply(split(v, v), seq_along)
   
