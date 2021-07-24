@@ -9,6 +9,13 @@
 #' overlap with an existing point, it is shifted sideways (along the group axis)
 #' by a minimal amount sufficient to avoid overlap. 
 #' 
+#' Whereas the `"swarm"` method places points in a predetermined order, the 
+#' `"compactswarm"` method uses a greedy strategy to determine which point will
+#' be placed next. This often leads to a more tightly-packed layout. The 
+#' strategy is very simple: on each iteration, a point that can be placed as 
+#' close as possible to the non-data axis is chosen and placed. If there are two 
+#' or more equally good points, `priority` is used to break ties.
+#' 
 #' The other 3 methods first discretise the values along the data axis, in order
 #' to create more efficient packing. The `"square"` method places points on a 
 #' square grid, whereas `"hex"` uses a hexagonal grid. `"centre"` uses a square grid
@@ -38,8 +45,11 @@
 #' but this is ultimately up to personal preference.
 #' @param side `integer`. Direction to perform jittering: use `0L` for both directions;
 #' `1L` for right/upwards; `-1L` for left/downwards.
-#' @param priority `string`. Method used to perform point layout, default is 
-#' `"ascending"`. See details below.
+#' @param priority `string`. Method used to perform point layout when method is 
+#' `"swarm"` or `"compactswarm`, default is 
+#' `"ascending"`; ignored otherwise. See details below.
+#' @param fast Use compiled version of algorithm? This option is ignored for all
+#' methods except `"swarm"` and `"compactswarm"`.
 #' @param dodge.width `numeric`. Amount to dodge points from different aesthetic
 #' groups, default is `NULL` for no dodging.
 #' @param corral `string`. Method used to adjust points that would be placed to
@@ -53,13 +63,14 @@
 #' @export
 position_beeswarm <- function(method = "swarm", spacing = 1,
                               side = 0L, priority = "ascending",
-                              dodge.width = NULL,
+                              fast = TRUE, dodge.width = NULL,
                               corral = "none", corral.width = 0.2) {
   ggproto(NULL, PositionBeeswarm,
           method = method,
           spacing = spacing,
           side = side, 
           priority = priority,
+          fast = fast,
           dodge.width = dodge.width,
           corral = corral,
           corral.width = corral.width
@@ -81,6 +92,7 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
                                 spacing = self$spacing,
                                 side = self$side,
                                 priority = self$priority,
+                                fast = self$fast,
                                 dodge.width = self$dodge.width,
                                 corral = self$corral,
                                 corral.width = self$corral.width,
@@ -134,6 +146,7 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
                                 spacing = params$spacing,
                                 side = params$side,
                                 priority = params$priority,
+                                fast = params$fast,
                                 corral = params$corral,
                                 corral.width = params$corral.width
                               )
@@ -149,15 +162,18 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
 
 pos_beeswarm <- function(df, plot.ylim.short, plot.xlim, plot.ylim, y.lim, 
                          method = "swarm", spacing = 1,
-                         side = 0L, priority = "ascending", corral = "none",
-                         corral.width = 0.2) {
-  if (method == "swarm") {
+                         side = 0L, priority = "ascending", fast = TRUE,
+                         corral = "none", corral.width = 0.2) {
+  if (method %in% c("swarm", "compactswarm")) {
     # adjust par("usr") based on input data
     graphics::par("usr" = c(plot.xlim, plot.ylim.short))
     
+    compact <- method == "compactswarm"
+    
     x.offset <- beeswarm::swarmx(
       x = rep(0, length(df$y)), y = df$y,
-      cex = spacing, side = side, priority = priority
+      cex = spacing, side = side, priority = priority,
+      fast = fast, compact = compact
     )$x
   } else {
     ## non-swarm methods

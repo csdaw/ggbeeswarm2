@@ -13,6 +13,7 @@ geom_beeswarm(
   spacing = 1,
   side = 0L,
   priority = "ascending",
+  fast = TRUE,
   dodge.width = NULL,
   corral = "none",
   corral.width = 0.2,
@@ -61,8 +62,12 @@ but this is ultimately up to personal preference.}
 \item{side}{\code{integer}. Direction to perform jittering: use \code{0L} for both directions;
 \code{1L} for right/upwards; \code{-1L} for left/downwards.}
 
-\item{priority}{\code{string}. Method used to perform point layout, default is
-\code{"ascending"}. See details below.}
+\item{priority}{\code{string}. Method used to perform point layout when method is
+\code{"swarm"} or \verb{"compactswarm}, default is
+\code{"ascending"}; ignored otherwise. See details below.}
+
+\item{fast}{Use compiled version of algorithm? This option is ignored for all
+methods except \code{"swarm"} and \code{"compactswarm"}.}
 
 \item{dodge.width}{\code{numeric}. Amount to dodge points from different aesthetic
 groups, default is \code{NULL} for no dodging.}
@@ -97,6 +102,13 @@ package.
 default \code{"swarm"} method places points in increasing order. If a point would
 overlap with an existing point, it is shifted sideways (along the group axis)
 by a minimal amount sufficient to avoid overlap.
+
+Whereas the \code{"swarm"} method places points in a predetermined order, the
+\code{"compactswarm"} method uses a greedy strategy to determine which point will
+be placed next. This often leads to a more tightly-packed layout. The
+strategy is very simple: on each iteration, a point that can be placed as
+close as possible to the non-data axis is chosen and placed. If there are two
+or more equally good points, \code{priority} is used to break ties.
 
 The other 3 methods first discretise the values along the data axis, in order
 to create more efficient packing. The \code{"square"} method places points on a
