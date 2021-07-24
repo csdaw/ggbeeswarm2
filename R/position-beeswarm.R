@@ -18,10 +18,10 @@
 #' 
 #' The other 3 methods first discretise the values along the data axis, in order
 #' to create more efficient packing. The `"square"` method places points on a 
-#' square grid, whereas `"hex"` uses a hexagonal grid. `"centre"` uses a square grid
-#' to produce a symmetric swarm. The number of break points for discretisation
-#' is determined by a combination of the available plotting area and the 
-#' `spacing` argument.
+#' square grid, whereas `"hex"` uses a hexagonal grid. `"centre"`/`"center"` 
+#' uses a square grid to produce a symmetric swarm. The number of break points 
+#' for discretisation is determined by a combination of the available plotting 
+#' area and the `spacing` argument.
 #' 
 #' **priority:** controls the order in which points are placed, which generally 
 #' has a noticeable effect on the plot appearance. `"ascending"` gives the 
@@ -65,6 +65,10 @@ position_beeswarm <- function(method = "swarm", spacing = 1,
                               side = 0L, priority = "ascending",
                               fast = TRUE, dodge.width = NULL,
                               corral = "none", corral.width = 0.2) {
+  match.arg(method, c("swarm", "compactswarm", "square", "hex", "centre", "center"))
+  
+  if (method %in% "center") method <- "centre"
+  
   ggproto(NULL, PositionBeeswarm,
           method = method,
           spacing = spacing,

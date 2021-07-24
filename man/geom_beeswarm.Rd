@@ -112,10 +112,10 @@ or more equally good points, \code{priority} is used to break ties.
 
 The other 3 methods first discretise the values along the data axis, in order
 to create more efficient packing. The \code{"square"} method places points on a
-square grid, whereas \code{"hex"} uses a hexagonal grid. \code{"centre"} uses a square grid
-to produce a symmetric swarm. The number of break points for discretisation
-is determined by a combination of the available plotting area and the
-\code{spacing} argument.
+square grid, whereas \code{"hex"} uses a hexagonal grid. \code{"centre"}/\code{"center"}
+uses a square grid to produce a symmetric swarm. The number of break points
+for discretisation is determined by a combination of the available plotting
+area and the \code{spacing} argument.
 
 \strong{priority:} controls the order in which points are placed, which generally
 has a noticeable effect on the plot appearance. \code{"ascending"} gives the
