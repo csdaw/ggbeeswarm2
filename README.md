@@ -12,13 +12,16 @@ coverage](https://codecov.io/gh/csdaw/ggbeeswarm2/branch/master/graph/badge.svg)
 
 ## Note
 
-This is a fork of ggbeeswarm under active development.
+This is a fork of ggbeeswarm which is in a stable but unfinished state.
+It will abandoned once the changes made here are implemented in
+[ggbeeswarm](https://github.com/eclarke/ggbeeswarm)
 
 The `position_beeswarm` function has been rewritten and is compatible
-with R &gt;= v4.0.0. Additionally, `position_beeswarm` works almost
+with R \>= v4.0.0. Additionally, `position_beeswarm` works almost
 identically to the `beeswarm` function from the
 [beeswarm](https://cran.r-project.org/web/packages/beeswarm/index.html)
-package.
+package with all the additional methods implemented (including the new
+`compactswarm`).
 
 For example:
 
