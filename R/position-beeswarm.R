@@ -120,9 +120,10 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
                               }
                               
                               # capture current par values
-                              current.par <- graphics::par("usr")
-                              # on exit return par("usr") to normal
-                              on.exit(graphics::par("usr" = current.par), add = TRUE)
+                              current.usr <- graphics::par("usr")
+                              current.mar <- graphics::par("mar")
+                              # on exit return par to normal
+                              on.exit(graphics::par("usr" = current.usr, "mar" = current.mar), add = TRUE)
                               
                               data <- .beeint$collide(
                                 data,
@@ -158,8 +159,6 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
                               # recombine list of data.frames into one
                               data <- Reduce(rbind, data)
                               
-
-                              
                               flip_data(data, params$flipped_aes)
                             }
 )
@@ -170,7 +169,8 @@ pos_beeswarm <- function(df, plot.ylim.short, plot.xlim, plot.ylim, y.lim,
                          corral = "none", corral.width = 0.2) {
   if (method %in% c("swarm", "compactswarm")) {
     # adjust par("usr") based on input data
-    graphics::par("usr" = c(plot.xlim, plot.ylim.short))
+    graphics::par("usr" = c(plot.xlim, plot.ylim.short),
+                  "mar" = c(1.9, 1.9, 0.3, 0.3))
     
     compact <- method == "compactswarm"
     
@@ -182,7 +182,8 @@ pos_beeswarm <- function(df, plot.ylim.short, plot.xlim, plot.ylim, y.lim,
   } else {
     ## non-swarm methods
     # adjust par("usr") based on input data
-    graphics::par("usr" = c(plot.xlim, plot.ylim))
+    graphics::par("usr" = c(plot.xlim, plot.ylim.short),
+                  "mar" = c(1.9, 1.9, 0.3, 0.3))
     
     # define size.x and size.y
     size.x <- graphics::xinch(0.08, warn.log = FALSE) * spacing
