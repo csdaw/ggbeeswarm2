@@ -53,10 +53,7 @@ distro2 <- as.data.frame(rev(distro)) %>%
 
  ggplot2::ggplot(distro2, aes(x = rev(variable), y = value)) + 
    geom_beeswarm(method = "hex") + 
-   scale_y_continuous(limits = c(-3, 3)) + 
-   theme(
-     plot.margin = unit(c(0.11, 0.07, 0.11, 0.07), "npc")
-   )
+   scale_y_continuous(limits = c(-3, 3))
 ```
 
 <img src="man/figures/README-ex-2.png" width="576" />
