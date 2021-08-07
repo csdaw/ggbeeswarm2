@@ -63,11 +63,11 @@ but this is ultimately up to personal preference.}
 \code{1L} for right/upwards; \code{-1L} for left/downwards.}
 
 \item{priority}{\code{string}. Method used to perform point layout when method is
-\code{"swarm"} or \verb{"compactswarm}, default is
+\code{"swarm"}, \code{"swarm2"}, or \code{"compactswarm"}, default is
 \code{"ascending"}; ignored otherwise. See details below.}
 
 \item{fast}{Use compiled version of algorithm? This option is ignored for all
-methods except \code{"swarm"} and \code{"compactswarm"}.}
+methods except \code{"swarm"}, \code{"swarm2"}, and \code{"compactswarm"}.}
 
 \item{dodge.width}{\code{numeric}. Amount to dodge points from different aesthetic
 groups, default is \code{NULL} for no dodging.}
@@ -101,12 +101,14 @@ package.
 \strong{method:} specifies the algorithm used to avoid overlapping points. The
 default \code{"swarm"} method places points in increasing order. If a point would
 overlap with an existing point, it is shifted sideways (along the group axis)
-by a minimal amount sufficient to avoid overlap.
+by a minimal amount sufficient to avoid overlap. The \code{"swarm2"} method is very
+similar to \code{"swarm"} but more closely follows the method used in the \code{beeswarm}
+package.
 
-Whereas the \code{"swarm"} method places points in a predetermined order, the
-\code{"compactswarm"} method uses a greedy strategy to determine which point will
-be placed next. This often leads to a more tightly-packed layout. The
-strategy is very simple: on each iteration, a point that can be placed as
+While the \code{"swarm"} and \code{"swarm2"} method places points in a predetermined
+order, the \code{"compactswarm"} method uses a greedy strategy to determine which
+point will be placed next. This often leads to a more tightly-packed layout.
+The strategy is very simple: on each iteration, a point that can be placed as
 close as possible to the non-data axis is chosen and placed. If there are two
 or more equally good points, \code{priority} is used to break ties.
 

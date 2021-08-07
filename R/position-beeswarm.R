@@ -7,12 +7,14 @@
 #' **method:** specifies the algorithm used to avoid overlapping points. The 
 #' default `"swarm"` method places points in increasing order. If a point would
 #' overlap with an existing point, it is shifted sideways (along the group axis)
-#' by a minimal amount sufficient to avoid overlap. 
+#' by a minimal amount sufficient to avoid overlap. The `"swarm2"` method is very
+#' similar to `"swarm"` but more closely follows the method used in the `beeswarm`
+#' package.
 #' 
-#' Whereas the `"swarm"` method places points in a predetermined order, the 
-#' `"compactswarm"` method uses a greedy strategy to determine which point will
-#' be placed next. This often leads to a more tightly-packed layout. The 
-#' strategy is very simple: on each iteration, a point that can be placed as 
+#' While the `"swarm"` and `"swarm2"` method places points in a predetermined 
+#' order, the `"compactswarm"` method uses a greedy strategy to determine which 
+#' point will be placed next. This often leads to a more tightly-packed layout. 
+#' The strategy is very simple: on each iteration, a point that can be placed as 
 #' close as possible to the non-data axis is chosen and placed. If there are two 
 #' or more equally good points, `priority` is used to break ties.
 #' 
@@ -46,10 +48,10 @@
 #' @param side `integer`. Direction to perform jittering: use `0L` for both directions;
 #' `1L` for right/upwards; `-1L` for left/downwards.
 #' @param priority `string`. Method used to perform point layout when method is 
-#' `"swarm"` or `"compactswarm`, default is 
+#' `"swarm"`, `"swarm2"`, or `"compactswarm"`, default is 
 #' `"ascending"`; ignored otherwise. See details below.
 #' @param fast Use compiled version of algorithm? This option is ignored for all
-#' methods except `"swarm"` and `"compactswarm"`.
+#' methods except `"swarm"`, `"swarm2"`, and `"compactswarm"`.
 #' @param dodge.width `numeric`. Amount to dodge points from different aesthetic
 #' groups, default is `NULL` for no dodging.
 #' @param corral `string`. Method used to adjust points that would be placed to
@@ -65,7 +67,7 @@ position_beeswarm <- function(method = "swarm", spacing = 1,
                               side = 0L, priority = "ascending",
                               fast = TRUE, dodge.width = NULL,
                               corral = "none", corral.width = 0.2) {
-  match.arg(method, c("swarm", "compactswarm", "square", "hex", "centre", "center"))
+  match.arg(method, c("swarm", "swarm2", "compactswarm", "square", "hex", "centre", "center"))
   
   if (method %in% "center") method <- "centre"
   
@@ -113,10 +115,14 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
                                 plot.ylim.short <- scales$x$get_limits()
                                 plot.ylim <- .beeint$expand_range4(scales$x$get_limits(), c(0.045, 0))
                                 plot.xlim <- .beeint$expand_range4(c(1, length(scales$y$get_limits())), c(0, 0.6))
+                                x.range <- get_range(scales$y)
+                                y.range <- get_range(scales$x)
                               } else {
                                 plot.ylim.short <- scales$y$get_limits()
                                 plot.ylim <- .beeint$expand_range4(scales$y$get_limits(), c(0.045, 0))
                                 plot.xlim <- .beeint$expand_range4(c(1, length(scales$x$get_limits())), c(0, 0.6))
+                                x.range <- get_range(scales$x)
+                                y.range <- get_range(scales$y)
                               }
                               
                               # capture current par values
@@ -139,7 +145,7 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
                               } else {
                                 data <- split(data, data$x)
                               }
-
+                              
                               # perform swarming separately for each data.frame
                               data <- lapply(
                                 data,
@@ -147,6 +153,8 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
                                 plot.ylim.short = plot.ylim.short,
                                 plot.xlim = plot.xlim, plot.ylim = plot.ylim,
                                 y.lim = params$y.lim,
+                                x.range = x.range,
+                                y.range = y.range,
                                 method = params$method,
                                 spacing = params$spacing,
                                 side = params$side,
@@ -164,18 +172,29 @@ PositionBeeswarm <- ggproto("PositionBeeswarm", Position,
 )
 
 pos_beeswarm <- function(df, plot.ylim.short, plot.xlim, plot.ylim, y.lim, 
+                         x.range, y.range,
                          method = "swarm", spacing = 1,
                          side = 0L, priority = "ascending", fast = TRUE,
                          corral = "none", corral.width = 0.2) {
-  if (method %in% c("swarm", "compactswarm")) {
-    # adjust par("usr") based on input data
-    graphics::par("usr" = c(plot.xlim, plot.ylim.short),
-                  "mar" = c(1.9, 1.9, 0.3, 0.3))
+  if (method %in% c("swarm", "swarm2", "compactswarm")) {
     
+    if (method %in% c("swarm2", "compactswarm")) {
+      # adjust par("usr") based on input data
+      graphics::par("usr" = c(plot.xlim, plot.ylim.short),
+                    "mar" = c(1.9, 1.9, 0.3, 0.3))
+      x.size <- graphics::xinch(0.08, warn.log = FALSE)
+      y.size <- graphics::yinch(0.08, warn.log = FALSE)
+    } else {
+      x.size <- x.range/100
+      y.size <- y.range/100
+    }
     compact <- method == "compactswarm"
     
     x.offset <- beeswarm::swarmx(
-      x = rep(0, length(df$y)), y = df$y,
+      x = rep(0, length(df$y)), 
+      y = df$y,
+      xsize = x.size,
+      ysize = y.size,
       cex = spacing, side = side, priority = priority,
       fast = fast, compact = compact
     )$x
@@ -285,4 +304,20 @@ determine_pos <- function(v, method, side) {
     }
   }
   unsplit(v.s, v)
+}
+
+get_range <- function(scales) {
+  if (is.null(scales$limits)) lim <- scales$range$range
+  else lim <- scales$get_limits()
+  
+  if (inherits(scales, "ScaleContinuous")) {
+    out <- diff(lim)
+  } else if (inherits(scales, "ScaleDiscrete")) {
+    out <- length(unique(lim))
+  } else {
+    stop("Unknown scale type")
+  }
+  
+  if (out == 0) out <- 1
+  out
 }
