@@ -18,13 +18,20 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/csdaw/ggbeeswarm2/workflows/R-CMD-check/badge.svg)](https://github.com/csdaw/ggbeeswarm2/actions)
 [![Codecov test coverage](https://codecov.io/gh/csdaw/ggbeeswarm2/branch/master/graph/badge.svg)](https://codecov.io/gh/csdaw/ggbeeswarm2?branch=master)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
 ## Note
 
-This is a fork of ggbeeswarm which is in a stable but unfinished state. 
-It will abandoned once the changes made here are implemented in 
-[ggbeeswarm](https://github.com/eclarke/ggbeeswarm)
+This is a fork of ggbeeswarm which is in an experimental and unfinished state. 
+**Some of changes made here including additional swarming and corral methods 
+are now available in the development version of
+[ggbeeswarm](https://github.com/eclarke/ggbeeswarm), which is probably what you
+should be using.**
+
+I plan on trying out re-writing these functions (again) so that the swarming 
+is performed based on the plotting area and size of the plotting character as 
+opposed to just the x/y range of the data (as in ggbeeswarm).
 
 The `position_beeswarm` function has been 
 rewritten and is compatible with R >= v4.0.0. Additionally, `position_beeswarm` 
