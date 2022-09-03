@@ -6,9 +6,7 @@
 \alias{ggbeeswarm2-package}
 \title{ggbeeswarm2: Categorical Scatter (Violin Point) Plots}
 \description{
-Provides two methods of plotting categorical scatter plots such
-    that the arrangement of points within a category reflects the density of
-    data at that region, and avoids over-plotting.
+Provides two methods of plotting categorical scatter plots such that the arrangement of points within a category reflects the density of data at that region, and avoids over-plotting.
 }
 \seealso{
 Useful links:
